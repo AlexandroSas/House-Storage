@@ -1,63 +1,48 @@
-const CACHE_NAME = 'houst-storage-v1'
-const URLS_TO_CHACHE = [
+const CACHE_NAME = 'house-storage-v1';
+const urlsToCache = [
+  '/House-Storage/',
   '/House-Storage/index.html',
-  '/House-Storage/css/styles.css',
-]
+  '/House-Storage/styles.css',
+  '/House-Storage/script.js',
+  // Add more URLs as needed
+];
 
-// Install and Cache
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log('Opened cache')
-            return cache.addAll(URLS_TO_CHACHE).catch((error) => {
-                console.error('Failed to cache resources:', error)
-            })
+self.addEventListener('install', function(event) {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
+      })
+      .catch(function(error) {
+        console.error('Failed to cache resources:', error);
+      })
+  );
+});
+
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    caches.match(event.request)
+      .then(function(response) {
+        if (response) {
+          return response; // Return the cached response if found
+        }
+        return fetch(event.request); // Fetch from network if not in cache
+      })
+  );
+});
+
+self.addEventListener('activate', function(event) {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName); // Delete old caches
+          }
         })
-        .catch((error) => {
-            console.error('Failed to open cache:', error)
-        })
-    )
-})
-  
-// Fetch and Cache
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            if (response) {
-                return response  
-            }
-  
-            const fetchRequest = event.request.clone()
-  
-            return fetch(fetchRequest).then((fetchResponse) => {
-                if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
-                    return fetchResponse
-                }
-  
-                const responseToCache = fetchResponse.clone()
-  
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, responseToCache)
-                })
-  
-                return fetchResponse
-            })
-            .catch((error) => {
-                console.error('Fetching failed:', error)
-                throw error
-            })
-        })
-    )
-})
-  
-// Clean Cache
-self.addEventListener('activate', (event) => {
-    const cacheWhitelist = [CACHE_NAME]
-    event.waitUntil(
-        caches.keys().then((keyList) => Promise.all(keyList.map((key) => {
-            if (!cacheWhitelist.includes(key)) {
-                return caches.delete(key)
-            }
-        })))
-    )
-})
+      );
+    })
+  );
+});
