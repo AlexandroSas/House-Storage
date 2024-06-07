@@ -2,8 +2,7 @@ const CACHE_NAME = 'house-storage-v1';
 const urlsToCache = [
   '/House-Storage/',
   '/House-Storage/index.html',
-  '/House-Storage/styles.css',
-  '/House-Storage/script.js',
+  '/House-Storage/styles.css'
   // Add more URLs as needed
 ];
 
