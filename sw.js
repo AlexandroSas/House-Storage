@@ -1,7 +1,7 @@
 const CACHE_NAME = 'houst-storage-v1'
 const URLS_TO_CHACHE = [
-  '/House-Storage/index.html',
-  '/House-Storage/css/styles.css',
+  '/index.html',
+  '/css/styles.css',
 ]
 
 // Install and Cache
